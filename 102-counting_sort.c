@@ -1,53 +1,54 @@
 #include "sort.h"
-#include <stdlib.h>
+#include "stdlib.h"
 
 /**
- *counting_sort - sort and array by counting sort method
- *@array: input array to be sorted
- *@size: size of the array
+ * counting_sort - sorts an array of integers in ascending order using the
+ * Counting sort algorithm
+ * @array: array to sort
+ * @size: size of the array to sort
  *
- *Return: Nothing,
+ * Return: void
  */
 void counting_sort(int *array, size_t size)
 {
-	size_t k;
-	int max_num, i;
-	int *count_array, *sort_array = malloc(size * sizeof(int));
+	int i, max;
+	int *count = NULL, *copy = NULL;
+	size_t j, temp, total = 0;
 
-	if (size < 2)
+
+	if (array == NULL || size < 2)
 		return;
-	max_num = array[0];
-	if (sort_array == NULL)
+	copy = malloc(sizeof(int) * size);
+	if (copy == NULL)
+		return;
+	for (j = 0, max = 0; j < size; j++)
 	{
-		free(sort_array);
+		copy[j] = array[j];
+		if (array[j] > max)
+			max = array[j];
+	}
+	count = malloc(sizeof(int) * (max + 1));
+	if (count == NULL)
+	{
+		free(copy);
 		return;
 	}
-	for (k = 0; k < size; k++)
-		sort_array[k] = array[k];
-	for (k = 0; k < size; k++)
+	for (i = 0; i <= max; i++)
+		count[i] = 0;
+	for (j = 0; j < size; j++)
+		count[array[j]] += 1;
+	for (i = 0; i <= max; i++)
 	{
-		if (array[k] > max_num)
-			max_num = array[k];
+		temp = count[i];
+		count[i] = total;
+		total += temp;
 	}
-	count_array = malloc((max_num + 1) * sizeof(int));
-	if (count_array == NULL)
+	for (j = 0; j < size; j++)
 	{
-		free(count_array);
-			return;
+		array[count[copy[j]]] = copy[j];
+		count[copy[j]] += 1;
 	}
-	for (i = 0; i <= max_num; i++)
-		count_array[i] = 0;
-	for (k = 0; k < size; k++)
-		count_array[array[k]]++;
-	for (i = 1; i <= max_num; i++)
-		count_array[i] = count_array[i] + count_array[i - 1];
-	print_array(count_array, max_num + 1);
-	for (k = 0; k < size; k++)
-	{
-		sort_array[count_array[array[k]] - 1] = array[k];
-		count_array[array[k]] = count_array[array[k]] - 1;
-	}
-	for (k = 0; k < size; k++)
-		array[k] = sort_array[k];
-	free(count_array), free(sort_array);
+	print_array(count, max + 1);
+	free(count);
+	free(copy);
 }
